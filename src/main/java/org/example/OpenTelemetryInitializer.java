@@ -24,7 +24,7 @@ public class OpenTelemetryInitializer {
         // Initialize Datadog exporter
         OtlpGrpcSpanExporter exporter = OtlpGrpcSpanExporter.builder()
                 .setEndpoint("https://app.datadoghq.com")
-                .addHeader("","")
+                .addHeader("keyDatadogApi","value")
                 .build();
 
         Resource resource = Resource.getDefault()
