@@ -1,14 +1,21 @@
 package org.example;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.logs.SdkLoggerProvider;
+import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.semconv.ResourceAttributes;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -16,20 +23,35 @@ public class OpenTelemetryInitializer {
     public static OpenTelemetry initOpenTelemetry() {
         // Initialize Datadog exporter
         OtlpGrpcSpanExporter exporter = OtlpGrpcSpanExporter.builder()
-                .setEndpoint("datadoghq.com")
-//                .addHeader("key","val")
+                .setEndpoint("https://app.datadoghq.com")
+                .addHeader("83b4ea6d-1c3f-55be-b563-274715c1728d","450d437e4234a90b04a15396bd2a83b8")
                 .build();
 
-        // Create a tracer provider
-        SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
-                .addSpanProcessor(BatchSpanProcessor.builder(exporter).build())
-                .setResource(Resource.getDefault())
+        Resource resource = Resource.getDefault()
+                .merge(Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, "logical-service-name")));
+
+        SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
+                .addSpanProcessor(BatchSpanProcessor.builder(OtlpGrpcSpanExporter.builder().build()).build())
+                .setResource(resource)
                 .build();
 
-        // Initialize the OpenTelemetry instance
+        SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
+                .registerMetricReader(PeriodicMetricReader.builder(OtlpGrpcMetricExporter.builder().build()).build())
+                .setResource(resource)
+                .build();
+
+        SdkLoggerProvider sdkLoggerProvider = SdkLoggerProvider.builder()
+                .addLogRecordProcessor(BatchLogRecordProcessor.builder(OtlpGrpcLogRecordExporter.builder().build()).build())
+                .setResource(resource)
+                .build();
+
         OpenTelemetry openTelemetry = OpenTelemetrySdk.builder()
-                .setTracerProvider(tracerProvider)
+                .setTracerProvider(sdkTracerProvider)
+                .setMeterProvider(sdkMeterProvider)
+                .setLoggerProvider(sdkLoggerProvider)
+                .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
                 .buildAndRegisterGlobal();
+
 
         return openTelemetry;
     }

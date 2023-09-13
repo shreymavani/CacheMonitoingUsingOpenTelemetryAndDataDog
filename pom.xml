@@ -17,15 +17,15 @@
   <dependencies>
     <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-sdk -->
     <dependency>
-    <groupId>io.opentelemetry</groupId>
-    <artifactId>opentelemetry-sdk</artifactId>
-    <version>1.30.0</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>30.1-jre</version> <!-- Update to the latest version -->
+    </dependency>
+
+    <dependency>
+    <groupId>io.opentelemetry</groupId>
+    <artifactId>opentelemetry-sdk</artifactId>
+    <version>1.30.0</version>
     </dependency>
 
     <dependency>
@@ -41,6 +41,12 @@
       <version>1.27.0</version>
     </dependency>
 
+    <dependency>
+      <!-- Not managed by opentelemetry-bom -->
+      <groupId>io.opentelemetry.semconv</groupId>
+      <artifactId>opentelemetry-semconv</artifactId>
+      <version>1.21.0-alpha</version>
+    </dependency>
 
   </dependencies>
 </project>
