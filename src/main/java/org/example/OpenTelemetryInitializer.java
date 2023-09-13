@@ -2,6 +2,7 @@ package org.example;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter;
@@ -25,6 +26,10 @@ public class OpenTelemetryInitializer {
         Resource resource = Resource.getDefault()
                 .merge(Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, "logical-service-name")));
 
+//        OtlpGrpcSpanExporter exporter = OtlpGrpcSpanExporter.builder()
+//                .setEndpoint("your-otlp-endpoint-url") // Replace with your OTLP endpoint URL
+//                .addHeader("api-key","your-api-key")
+//                .build();
 
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
                 .addSpanProcessor(BatchSpanProcessor.builder(OtlpGrpcSpanExporter.builder().build()).build())

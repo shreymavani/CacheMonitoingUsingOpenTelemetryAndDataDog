@@ -13,7 +13,7 @@
    ```
    java -javaagent:/path/to/dd-java-agent.jar -Ddd.trace.otel.enabled=true -jar /path/to/yourcode.jar
    ```
-
+4. Make Sure have configured Datadog on your local before running the 3rd step.
 
 ## References : 
 
