@@ -21,14 +21,11 @@ import java.util.concurrent.TimeUnit;
 
 public class OpenTelemetryInitializer {
     public static OpenTelemetry initOpenTelemetry() {
-        // Initialize Datadog exporter
-        OtlpGrpcSpanExporter exporter = OtlpGrpcSpanExporter.builder()
-                .setEndpoint("https://app.datadoghq.com")
-                .addHeader("keyDatadogApi","value")
-                .build();
 
         Resource resource = Resource.getDefault()
                 .merge(Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, "logical-service-name")));
+
+        System.setProperty("dd.trace.otel.enabled", "true");
 
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
                 .addSpanProcessor(BatchSpanProcessor.builder(OtlpGrpcSpanExporter.builder().build()).build())
